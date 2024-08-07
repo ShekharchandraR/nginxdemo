@@ -5,6 +5,9 @@ pipeline {
         // Define any necessary environment variables
         IMAGE_NAME = 'nginxdemo'
         CONTAINER_NAME = 'nginxdemo'
+	DOCKER_ps = 'docker ps'
+	DOCKER_PS_A = 'docker ps -a'
+	DOCKER_IMAGE = 'docker images'
     }
 
     stages {
@@ -39,10 +42,10 @@ pipeline {
             // Clean up the Docker containers and images
             script {
                 // Stop and remove the container
-                sh "docker stop $( docker ps  ) || true"
-                sh "docker rm $( docker ps -a ) || true"
+                sh "docker stop $( DOCKER_PS  ) || true"
+                sh "docker rm $( DOCKER_PS_A ) || true"
                 // Optionally remove the image
-                sh "docker stop $( docker images ) || true"
+                sh "docker stop $( DOCKER_IMAGES ) || true"
             }
         }
     }
