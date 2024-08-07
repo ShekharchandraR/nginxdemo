@@ -39,10 +39,10 @@ pipeline {
             // Clean up the Docker containers and images
             script {
                 // Stop and remove the container
-                sh "docker stop ${CONTAINER_NAME} || true"
-                sh "docker rm ${CONTAINER_NAME} || true"
+                sh "docker stop $( docker ps  ) || true"
+                sh "docker rm $( docker ps -a ) || true"
                 // Optionally remove the image
-                sh "docker rmi ${IMAGE_NAME} || true"
+                sh "docker stop $( docker images ) || true"
             }
         }
     }
