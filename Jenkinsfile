@@ -4,7 +4,7 @@ pipeline {
     environment {
         // Define any necessary environment variables
         IMAGE_NAME = 'nginxdemo'
-        CONTAINER_NAME = 'nginxdemocont'
+        CONTAINER_NAME = 'nginxdemo'
     }
 
     stages {
