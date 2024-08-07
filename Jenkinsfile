@@ -2,36 +2,38 @@ pipeline {
     agent any 
 
     environment {
-        // Define any necessary environment variables
-        IMAGE_NAME = 'nginxdemo'
-        CONTAINER_NAME = 'nginxdemo'
-	DOCKER_ps = 'docker ps'
-	DOCKER_PS_A = 'docker ps -a'
-	DOCKER_IMAGE = 'docker images'
+        IMAGE_NAME = 'nginx:latest' // Specify the Nginx image
+        CONTAINER_NAME = 'nginx_container' // Name for your container
+        DOCKER_CREDENTIALS_ID = 'your-docker-credentials-id' // Your Docker credentials ID (if needed)
     }
 
     stages {
-        stage('Checkout Code') {
-            steps {
-                // Checkout your code from the repository
-                checkout scm
-            }
-        }
-
-        stage('Build Docker Image') {
+        stage('Pull Latest Nginx Image') {
             steps {
                 script {
-                    // Build the Docker image
-                    docker.build(IMAGE_NAME)
+                    // Pull the latest Nginx image
+                    sh "docker pull ${IMAGE_NAME}"
                 }
             }
         }
 
-        stage('Run Docker Container') {
+        stage('Stop and Remove Existing Container') {
             steps {
                 script {
-                    // Run the Docker container
-                    docker.run(IMAGE_NAME, CONTAINER_NAME, '-d')
+                    // Stop and remove the existing container if it exists
+                    sh """
+                    docker stop ${CONTAINER_NAME} || true
+                    docker rm ${CONTAINER_NAME} || true
+                    """
+                }
+            }
+        }
+
+        stage('Run New Nginx Container') {
+            steps {
+                script {
+                    // Run the new Nginx container
+                    sh "docker run --name ${CONTAINER_NAME} -d -p 80:80 ${IMAGE_NAME}"
                 }
             }
         }
@@ -39,13 +41,9 @@ pipeline {
 
     post {
         always {
-            // Clean up the Docker containers and images
             script {
-                // Stop and remove the container
-                sh "docker stop $( DOCKER_PS  ) || true"
-                sh "docker rm $( DOCKER_PS_A ) || true"
-                // Optionally remove the image
-                sh "docker stop $( DOCKER_IMAGES ) || true"
+                // Cleanup: Optionally remove the image
+                sh "docker rmi ${IMAGE_NAME} || true"
             }
         }
     }
