@@ -1,9 +1,14 @@
 pipeline {
     agent any
     stages {
-        stage('Example') {
+        stage('Build Docker') {
             steps {
-                echo "hello"
+                echo "Build image"
+		
+                script {
+                    def customImage = docker.build("my-image:${env.BUILD_ID}")
+                    customImage.push()
+                }
             }
         }
     }
