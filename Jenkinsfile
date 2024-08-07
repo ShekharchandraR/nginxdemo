@@ -2,17 +2,23 @@ pipeline {
     agent any 
 
     environment {
-        IMAGE_NAME = 'nginx:latest' // Specify the Nginx image
-        CONTAINER_NAME = 'nginx_container' // Name for your container
-        DOCKER_CREDENTIALS_ID = 'your-docker-credentials-id' // Your Docker credentials ID (if needed)
+        IMAGE_NAME = 'nginxdemo' // Your custom Nginx image name
+        CONTAINER_NAME = 'nginx_container' // Name for your running container
     }
 
     stages {
-        stage('Pull Latest Nginx Image') {
+        stage('Checkout Code') {
+            steps {
+                // Checkout your code containing the Dockerfile
+                checkout scm
+            }
+        }
+
+        stage('Build Custom Nginx Docker Image') {
             steps {
                 script {
-                    // Pull the latest Nginx image
-                    sh "docker pull ${IMAGE_NAME}"
+                    // Build the Docker image from the Dockerfile
+                    sh "docker build -t ${IMAGE_NAME} ."
                 }
             }
         }
@@ -33,7 +39,7 @@ pipeline {
             steps {
                 script {
                     // Run the new Nginx container
-                    sh "docker run --name ${CONTAINER_NAME} -d -p 80:80 ${IMAGE_NAME}"
+                    sh "docker run --name ${CONTAINER_NAME} -d -p 8000:80 ${IMAGE_NAME}"
                 }
             }
         }
@@ -42,7 +48,7 @@ pipeline {
     post {
         always {
             script {
-                // Cleanup: Optionally remove the image
+                // Optionally remove the image after running
                 sh "docker rmi ${IMAGE_NAME} || true"
             }
         }
